@@ -2,12 +2,8 @@ package ift615tp1;
 
 import connect5.Grille;
 import connect5.Joueur;
-import ift615tp1.Arbre;
 import ift615tp1.Arbre.Noeud;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 
 
 /*

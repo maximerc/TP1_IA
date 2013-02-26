@@ -1,8 +1,5 @@
 package ift615tp1;
 
-import connect5.Grille;
-import java.util.List;
-
 public class Ligne {
     private int[] debut; // [l,c]
     private int[] fin;   // [l,c]
