@@ -22,6 +22,10 @@ public class JoueurArtificiel implements Joueur {
     private Noeud noeudMax = new Noeud();
     private int profondeurInitiale=0;
     
+    public int getDernierJoueur(Grille g) {
+            return ( g.nbLibre()%2==0 ) ? 1 : 2;
+    }
+    
     public int[] getProchainCoup(Grille g, int delais) {
         if (couleurJoueur == '0') {
             couleurJoueur = (g.nbLibre()%2==0)?'N':'B';
@@ -108,10 +112,106 @@ public class JoueurArtificiel implements Joueur {
     }
     
     
+  private int heuristic1(Grille g)
+    {
+        Set<Ligne> lignes = new HashSet<Ligne>();
+        int joueur = getDernierJoueur(g);
+        
+        for(int l = 0 ; l < g.getData().length;l++)
+            for(int c = 0; c < g.getData()[0].length ; c++)
+                if(g.getData()[l][c] == joueur)
+                    TesterLignesPossibles(l,c,g, lignes, joueur);    
+        
+        return lignes.size();
+    }
+    
+    private void TesterLignesPossibles(int l, int c, Grille g, Set<Ligne> lignes, int joueur)
+    {
+        int nbEnLigne =0;
 
+        //****** HORIZONTAL *********
+        for(int i = c -4 ; i <= c + 4; i++)
+        {   
+            if(i < 0 || i > g.getData()[0].length - 1)
+                continue;
 
+            if(g.getData()[l][i] == 0 || g.getData()[l][i] == joueur)
+                nbEnLigne++;
+            else
+                nbEnLigne = 0;
+            
+            if(nbEnLigne >= 5)
+            {      
+                lignes.add(new Ligne(l, i - 4, l, i));
+                
+                nbEnLigne--;
+            }
+        }
+        nbEnLigne = 0;
+        //System.out.println("Horizontal : " + lignes.size());
 
+        //****** VERTICAL *********
+        for(int i = l -4 ; i <= l + 4; i++)
+        {   
+            if(i < 0 || i > g.getData().length - 1)
+                continue;
+   
+            if(g.getData()[i][c] == 0 || g.getData()[i][c] == joueur)
+                nbEnLigne++;
+            else
+                nbEnLigne = 0;
+   
+            if(nbEnLigne >= 5)
+            {      
+                lignes.add(new Ligne(i - 4, c, i, c));
+                
+                nbEnLigne--;
+            }            
+        }
+        nbEnLigne = 0;
+        //System.out.println("Vertical : " + lignes.size());
+        
+        //****** DIAGONAL \ *********
+        for(int i = - 4 ; i <= 4; i++)
+        {   
+            if(l + i < 0 || c + i < 0 || 
+                    l + i > g.getData().length -1 ||
+                    c + i > g.getData()[0].length -1)
+               continue;
 
+            if(g.getData()[l + i][c + i] == 0 || g.getData()[l + i][c + i] == joueur)
+                nbEnLigne++;
+            else
+                nbEnLigne = 0;
+            
+            if(nbEnLigne >= 5)
+            {                    
+                lignes.add(new Ligne(l + i - 4, c + i - 4,l + i, c + i));
+                nbEnLigne--;
+            }
+            
+        }
+        nbEnLigne = 0;
+        //System.out.println("Diago \\ : " + lignes.size());
+        
+        //****** DIAGONAL / *********
+        for(int i = -4 ; i <= 4; i++)
+        {   
+            if(l + i < 0 || c - i < 0 ||
+               l + i > g.getData().length -1 || c - i > g.getData()[0].length - 1)
+               continue;
 
+            if(g.getData()[l + i][c - i] == 0 || g.getData()[l + i][c - i] == joueur)
+                nbEnLigne++;
+            else
+                nbEnLigne = 0;
 
+            if(nbEnLigne >= 5)
+            {                    
+                lignes.add(new Ligne(l + i, c + i, l + i + 4, c + i + 4));
+                nbEnLigne--;
+            }
+        }
+        //System.out.println("Diago / : " + lignes.size());        
+    }    
 }
