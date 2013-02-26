@@ -49,7 +49,7 @@ import java.util.List;
 
 		while (true) {
 			//if temps limite ? 
-            //break;
+            			//break;
 			genererEnfants(joueur, noeud, increment);
 
 			if (noeud.voisinDroite == null)
