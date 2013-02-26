@@ -57,16 +57,20 @@ public class JoueurArtificiel implements Joueur {
         
         try {
             // Une exception sera lancée lorsque le temps est écoulé
+		
             while( true ) {
                 
                 if (System.currentTimeMillis() > miaw-50) {
                     break;
                 }
-//                arbre.ajouterProfondeur(profondeur);
-//                profondeurInitiale = profondeur;
+		
                 Arbre arbre = new Arbre(g, joueur);
                 alphaBeta(arbre.racine, profondeur, a, b, true);
+		
                 profondeur++;
+	        System.out.println("profondeur: " + profondeur + " - nblibre : " + g.nbLibre());
+		if ( profondeur > g.nbLibre() )
+			break;
             }
         } catch (Exception ex) {
             int i=0;
@@ -74,7 +78,6 @@ public class JoueurArtificiel implements Joueur {
         }
         return this.noeudMax;
         
-       // return /* TODO : return Le coup à jouer */0;
     }
 
     public int alphaBeta(Noeud noeud, int profondeur, int a, int b, boolean tour) throws Exception {
@@ -85,12 +88,6 @@ public class JoueurArtificiel implements Joueur {
 //        
         if ( profondeur <= 0 || noeud.g.nbLibre()==0 ) {
             int h = evaluate(noeud); //heuristic
-            
-            if (this.max < h) {
-                this.max = h;
-                this.noeudMax = noeud;
-            }
-            
             return ( tour ? h : -h );
         }
         //creer les enfants
@@ -99,20 +96,26 @@ public class JoueurArtificiel implements Joueur {
         // Si c'est "notre" tour (Max)
         if (tour == true) {
             for (Noeud enfant : noeud.enfants) {
-                a = alphaBeta(enfant, profondeur-1, a, b, !tour);
+		int alpha = alphaBeta(enfant, profondeur-1, a, b, !tour);
+		if ( a > alpha ) {
+			a = alpha;
+			this.noeudMax = enfant;
+		}
                 if (b <= a)
                     break;
             }
-        // Min
-        } else {
+	    return a;
+        } else {  // Min
             for (Noeud enfant : noeud.enfants) {
-                b = Math.min(b, alphaBeta(enfant, profondeur-1, a, b, !tour));
+                int beta = alphaBeta(enfant, profondeur-1, a, b, !tour);
+		if ( b < beta ) {
+			b = beta;
+		}
                 if (b <= a)
                     break;
             }
+	    return b;
         }
-        
-        return 0;
     }
     
     
