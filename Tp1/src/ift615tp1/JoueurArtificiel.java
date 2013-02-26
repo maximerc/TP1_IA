@@ -14,8 +14,6 @@ import java.util.Set;
  * Maxime Routhier Couture    (11 064 947)
  * Keven Fecteau              (11 089 305)
  */
- 
-private long finHorlogeDeGarde;
 
 public class JoueurArtificiel implements Joueur {
     private long finHorlogeDeGarde;
@@ -27,11 +25,6 @@ public class JoueurArtificiel implements Joueur {
     }
     
     public int[] getProchainCoup(Grille g, int delais) {
-        if (couleurJoueur == '0') {
-            couleurJoueur = (g.nbLibre()%2==0)?'N':'B';
-            joueur = (couleurJoueur=='N')?'1':'2';
-        }
-            
         int a = Integer.MAX_VALUE;
         int b = Integer.MIN_VALUE;
         iterativeDeepening(a, b, g, delais);
