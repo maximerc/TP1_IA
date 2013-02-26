@@ -41,11 +41,20 @@ import java.util.List;
 		racine.enfants = new ArrayList<Noeud>();
 		genererEnfants(joueur, racine, profondeur);
 	}
+	
+	public Grille clonerGrille(Grille g) {
+		int nbligne = g.getData().length;
+		int nbcol = g.getData()[0].length;
+		Grille gg = new Grille(nbligne, nbcol);
+		for(int ln=0;ln<nbligne;ln++)
+			for(int col=0;col<nbcol;col++)
+				gg.set(ln, col, g.get(ln, col));
+		return gg;
+	}
 
 	public void ajouterProfondeur(int increment) {
 		Noeud noeud = dernierEtage; 
-
-		int joueur = (racine.g.nbLibre()%2==0)?'1':'2';
+		int joueur = (racine.g.nbLibre()%2==0) ? 1 : 2;
 
 		while (true) {
 			//if temps limite ? 
@@ -59,21 +68,22 @@ import java.util.List;
 	}
 
 	public void genererEnfants(int joueur, Noeud noeud, int profondeur) {
+		if (profondeur <= 0)
+			return;
+		
 		List vides = new ArrayList();
 		int nbligne = noeud.g.getData().length;
 		int nbcol = noeud.g.getData()[0].length;
 		Noeud voisinGauche = new Noeud();
 		for(int l=0;l<nbligne;l++) {
 			boolean premierNoeud = true;
-			for(int c=1;c<nbcol;c++) {
+			for(int c=0;c<nbcol;c++) {
 				if(noeud.g.getData()[l][c]==0) {
-					Grille gg = noeud.g;
-					gg.set(l, c, joueur);
-
 					Noeud n = new Noeud();
 					n.parent = noeud;
 					n.l = l;
 					n.c = c;
+					n.g = clonerGrille(noeud.g);
 
 					racine.enfants.add(n);
 					if (premierNoeud) {

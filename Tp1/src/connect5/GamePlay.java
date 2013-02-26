@@ -80,10 +80,10 @@ public class GamePlay implements Runnable {
                 }
             }
             if(coup[0]<0 || coup[1]<0 || grille.get(coup[0], coup[1])!=0){
-                fireMessage("  Coup illégal pour le joueur #" + (nextjoueur+1));
-                gagnant = (nextjoueur+1)%joueurs.length + 1;
-                erreur = true;
-                return;
+//                fireMessage("  Coup illégal pour le joueur #" + (nextjoueur+1));
+//                gagnant = (nextjoueur+1)%joueurs.length + 1;
+//                erreur = true;
+//                return;
             }
             grille.set(coup[0], coup[1], nextjoueur+1);
             if(grilleObserver!=null) grilleObserver.grilleChanged(grille);

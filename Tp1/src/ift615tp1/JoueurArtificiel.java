@@ -35,8 +35,7 @@ public class JoueurArtificiel implements Joueur {
     public int evaluate(Noeud noeud)
     {
         int value = 0;
-        
-        value += heuristic1(g);
+        value += heuristic1(noeud.g);
         //value += heuristic2(g);
         //value += heuristic3(g);
 
@@ -44,8 +43,8 @@ public class JoueurArtificiel implements Joueur {
     }
     
     public void iterativeDeepening(int a, int b, Grille g, int delais) {
-        
         int profondeur = 2;
+        int joueur = getDernierJoueur(g);
         finHorlogeDeGarde = System.currentTimeMillis() + delais;
         Arbre arbre = new Arbre(g, 1, joueur);
         
