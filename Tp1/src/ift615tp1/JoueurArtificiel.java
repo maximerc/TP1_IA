@@ -18,6 +18,7 @@ import java.util.Set;
 public class JoueurArtificiel implements Joueur {
     private long finHorlogeDeGarde;
     private Noeud noeudMax = new Noeud();
+    private int max = 0;
     private int profondeurInitiale=0;
     
     public int getDernierJoueur(Grille g) {
@@ -27,9 +28,15 @@ public class JoueurArtificiel implements Joueur {
     public int[] getProchainCoup(Grille g, int delais) {
         int a = Integer.MAX_VALUE;
         int b = Integer.MIN_VALUE;
-        iterativeDeepening(a, b, g, delais);
+        
+        
+        this.max = 0;
+//        this.noeudMax = null;
+        
+        Noeud noeud = iterativeDeepening(a, b, g, delais);
+        noeud = noeud.getCoup();
     
-        return new int[]{noeudMax.getLigne(), noeudMax.getColonne()};
+        return new int[]{noeud.getLigne(), noeud.getColonne()};
     }
 
     public int evaluate(Noeud noeud)
@@ -42,47 +49,57 @@ public class JoueurArtificiel implements Joueur {
         return value;
     }
     
-    public void iterativeDeepening(int a, int b, Grille g, int delais) {
-        int profondeur = 2;
+    public Noeud iterativeDeepening(int a, int b, Grille g, int delais) {
+        int profondeur = 20;
         int joueur = getDernierJoueur(g);
         finHorlogeDeGarde = System.currentTimeMillis() + delais;
-        Arbre arbre = new Arbre(g, 1, joueur);
+        long miaw = System.currentTimeMillis() + delais;
         
         try {
             // Une exception sera lancée lorsque le temps est écoulé
-            while(true) {
-                arbre.ajouterProfondeur(profondeur);
-                profondeurInitiale = profondeur;
+            while( true ) {
+                
+                if (System.currentTimeMillis() > miaw-50) {
+                    break;
+                }
+//                arbre.ajouterProfondeur(profondeur);
+//                profondeurInitiale = profondeur;
+                Arbre arbre = new Arbre(g, joueur);
                 alphaBeta(arbre.racine, profondeur, a, b, true);
                 profondeur++;
             }
         } catch (Exception ex) {
+            int i=0;
             // TODO : planter si l'exception n'est pas un "Timeout"
         }
+        return this.noeudMax;
         
        // return /* TODO : return Le coup à jouer */0;
     }
 
     public int alphaBeta(Noeud noeud, int profondeur, int a, int b, boolean tour) throws Exception {
-        if (System.currentTimeMillis() < finHorlogeDeGarde) {
-            throw new Exception("Timeout");
-        }
-        
-        if ((profondeur == 0) || (noeud.enfants.isEmpty())) {
+//        if (System.currentTimeMillis() < finHorlogeDeGarde) {
+////            return this.noeudMax;
+//            throw new Exception("Timeout");
+//        }
+//        
+        if ( profondeur <= 0 || noeud.g.nbLibre()==0 ) {
             int h = evaluate(noeud); //heuristic
+            
+            if (this.max < h) {
+                this.max = h;
+                this.noeudMax = noeud;
+            }
+            
             return ( tour ? h : -h );
         }
+        //creer les enfants
+        noeud.genererEnfants();
         
         // Si c'est "notre" tour (Max)
         if (tour == true) {
             for (Noeud enfant : noeud.enfants) {
-                int nouvelleEssai = alphaBeta(enfant, profondeur-1, a, b, !tour);
-                if(a < nouvelleEssai){
-                    a = nouvelleEssai;
-                    if(profondeur == profondeurInitiale-1)
-                        noeudMax = enfant;
-                }
-                
+                a = alphaBeta(enfant, profondeur-1, a, b, !tour);
                 if (b <= a)
                     break;
             }
