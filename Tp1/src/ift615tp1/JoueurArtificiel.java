@@ -50,7 +50,7 @@ public class JoueurArtificiel implements Joueur {
     {
         int value = 0;
         
-        //value += heuristic1(g);
+        value += heuristic1(g);
         //value += heuristic2(g);
         //value += heuristic3(g);
 
