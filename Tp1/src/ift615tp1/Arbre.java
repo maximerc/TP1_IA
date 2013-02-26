@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Antoine
 */
-  public class Arbre {
+  public /*CHAt miaw mikmwiamiwmfjcilhf */ class Arbre {
     
     public static class Noeud {
             public Grille g;
