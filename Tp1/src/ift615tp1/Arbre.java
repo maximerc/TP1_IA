@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Antoine
 */
-  public /*CHAt miaw mikmwiamiwmfjcilhf */ class Arbre {
+  public class Arbre {
     
     public static class Noeud {
             public Grille g;
@@ -49,7 +49,7 @@ import java.util.List;
 
 		while (true) {
 			//if temps limite ? 
-            //break;
+            			//break;
 			genererEnfants(joueur, noeud, increment);
 
 			if (noeud.voisinDroite == null)
