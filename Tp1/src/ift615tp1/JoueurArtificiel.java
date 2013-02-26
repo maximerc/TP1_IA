@@ -4,7 +4,6 @@ import connect5.Grille;
 import connect5.Joueur;
 import ift615tp1.Arbre.Noeud;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 
@@ -16,19 +15,16 @@ import java.util.Set;
  */
 
 public class JoueurArtificiel implements Joueur {
-    private long finHorlogeDeGarde;
     private Noeud noeudMax = new Noeud();
     private int max = 0;
-    private int profondeurInitiale=0;
     
     public int getDernierJoueur(Grille g) {
             return ( g.nbLibre()%2==0 ) ? 1 : 2;
     }
     
     public int[] getProchainCoup(Grille g, int delais) {
-        int a = Integer.MAX_VALUE;
-        int b = Integer.MIN_VALUE;
-        
+        int a = Integer.MIN_VALUE;
+        int b = Integer.MAX_VALUE;
         
         this.max = 0;
 //        this.noeudMax = null;
@@ -50,17 +46,15 @@ public class JoueurArtificiel implements Joueur {
     }
     
     public Noeud iterativeDeepening(int a, int b, Grille g, int delais) {
-        int profondeur = 20;
+        int profondeur = 2;
         int joueur = getDernierJoueur(g);
-        finHorlogeDeGarde = System.currentTimeMillis() + delais;
-        long miaw = System.currentTimeMillis() + delais;
+        long timeout = System.currentTimeMillis() + delais;
         
         try {
             // Une exception sera lancée lorsque le temps est écoulé
-		
-            while( true ) {
+            while (true) {
                 
-                if (System.currentTimeMillis() > miaw-50) {
+                if (System.currentTimeMillis() > timeout-50) {
                     break;
                 }
 		
