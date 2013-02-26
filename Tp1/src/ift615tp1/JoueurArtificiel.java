@@ -3,7 +3,9 @@ package ift615tp1;
 import connect5.Grille;
 import connect5.Joueur;
 import ift615tp1.Arbre.Noeud;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 
 /*
@@ -112,7 +114,7 @@ public class JoueurArtificiel implements Joueur {
     }
     
     
-  private int heuristic1(Grille g)
+    private int heuristic1(Grille g)
     {
         Set<Ligne> lignes = new HashSet<Ligne>();
         int joueur = getDernierJoueur(g);
