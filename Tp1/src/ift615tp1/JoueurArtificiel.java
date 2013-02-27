@@ -19,6 +19,7 @@ public class JoueurArtificiel implements Joueur {
     private Noeud noeudMax = new Noeud();
     private Noeud dernierNoeudMaxValide = new Noeud();
     private int joueurCourant;
+    private long timeout;
 
     public int getDernierJoueur(Grille g) {
             return ( g.nbLibre()%2==0 ) ? 2 : 1;
@@ -30,7 +31,6 @@ public class JoueurArtificiel implements Joueur {
     public int[] getProchainCoup(Grille g, int delais) {
         int a = Integer.MIN_VALUE;
         int b = Integer.MAX_VALUE;
-        
         
         joueurCourant = getProchainJoueur(g);
         Noeud noeud = iterativeDeepening(a, b, g, delais);
@@ -51,20 +51,17 @@ public class JoueurArtificiel implements Joueur {
     public Noeud iterativeDeepening(int a, int b, Grille g, int delais) {
         int profondeur = 1;
         int joueur = getProchainJoueur(g);
-        long timeout = System.currentTimeMillis() + delais;
+        timeout = System.currentTimeMillis() + delais;
         
         try {
             // Une exception sera lancée lorsque le temps est écoulé
             while (true) {
-                if (System.currentTimeMillis() > timeout - 50) {
-                    break;
-                }
                 System.out.println("profondeur: " + profondeur + " - nblibre : " + g.nbLibre());
                 Arbre arbre = new Arbre(g, joueur);
                 alphaBeta(arbre.racine, profondeur, a, b, true);
                 this.dernierNoeudMaxValide = this.noeudMax;
                 profondeur++;
-                if (profondeur > 2) {//g.nbLibre()) {
+                if (profondeur > g.nbLibre()) {
                     break;
                 }
             }
@@ -83,6 +80,11 @@ public class JoueurArtificiel implements Joueur {
 //            throw new Exception("Timeout");
 //        }
 //        
+        
+        if (System.currentTimeMillis() > timeout - 5) {
+            throw new Exception("Fin temps limite");
+        }
+        
         if (profondeur <= 0 || noeud.g.nbLibre() == 0) {
             int h = evaluate(noeud); //heuristic
             return h;//(tour ? -h : h);
