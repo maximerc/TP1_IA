@@ -17,9 +17,14 @@ public class JoueurArtificiel implements Joueur {
 
     private Noeud noeudMax = new Noeud();
     private int max = 0;
+    private int profondeurInitiale=0;
 
     public int getDernierJoueur(Grille g) {
-        return (g.nbLibre() % 2 == 0) ? 1 : 2;
+            return ( g.nbLibre()%2==0 ) ? 2 : 1;
+    }
+    
+    public int getProchainJoueur(Grille g) {
+            return ( g.nbLibre()%2==0 ) ? 1 : 2;
     }
 
     public int[] getProchainCoup(Grille g, int delais) {
@@ -46,9 +51,9 @@ public class JoueurArtificiel implements Joueur {
 
     public Noeud iterativeDeepening(int a, int b, Grille g, int delais) {
         int profondeur = 1;
-        int joueur = getDernierJoueur(g);
+        int joueur = getProchainJoueur(g);
         long timeout = System.currentTimeMillis() + delais;
-
+        
         try {
             // Une exception sera lancée lorsque le temps est écoulé
             while (true) {
