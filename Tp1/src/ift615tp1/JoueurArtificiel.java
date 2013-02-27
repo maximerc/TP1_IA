@@ -17,8 +17,8 @@ import java.util.Set;
 public class JoueurArtificiel implements Joueur {
 
     private Noeud noeudMax = new Noeud();
-    private int max = 0;
-    private int profondeurInitiale=0;
+    private Noeud dernierNoeudMaxValide = new Noeud();
+    private int joueurCourant;
 
     public int getDernierJoueur(Grille g) {
             return ( g.nbLibre()%2==0 ) ? 2 : 1;
@@ -27,16 +27,14 @@ public class JoueurArtificiel implements Joueur {
     public int getProchainJoueur(Grille g) {
             return ( g.nbLibre()%2==0 ) ? 1 : 2;
     }
-
     public int[] getProchainCoup(Grille g, int delais) {
         int a = Integer.MIN_VALUE;
         int b = Integer.MAX_VALUE;
-
-        this.max = 0;
-//        this.noeudMax = null;
-
+        
+        
+        joueurCourant = getProchainJoueur(g);
         Noeud noeud = iterativeDeepening(a, b, g, delais);
-        noeud = noeud.getCoup();
+        //noeud = noeud.getCoup();
 
         return new int[]{noeud.getLigne(), noeud.getColonne()};
     }
@@ -58,16 +56,14 @@ public class JoueurArtificiel implements Joueur {
         try {
             // Une exception sera lancée lorsque le temps est écoulé
             while (true) {
-
                 if (System.currentTimeMillis() > timeout - 50) {
                     break;
                 }
-
+                System.out.println("profondeur: " + profondeur + " - nblibre : " + g.nbLibre());
                 Arbre arbre = new Arbre(g, joueur);
                 alphaBeta(arbre.racine, profondeur, a, b, true);
-
+                this.dernierNoeudMaxValide = this.noeudMax;
                 profondeur++;
-                System.out.println("profondeur: " + profondeur + " - nblibre : " + g.nbLibre());
                 if (profondeur > 2) {//g.nbLibre()) {
                     break;
                 }
@@ -76,7 +72,8 @@ public class JoueurArtificiel implements Joueur {
             int i = 0;
             // TODO : planter si l'exception n'est pas un "Timeout"
         }
-        return this.noeudMax;
+        System.out.println("Noeud max : " + this.evaluate(this.dernierNoeudMaxValide));
+        return this.dernierNoeudMaxValide;
 
     }
 
@@ -88,7 +85,7 @@ public class JoueurArtificiel implements Joueur {
 //        
         if (profondeur <= 0 || noeud.g.nbLibre() == 0) {
             int h = evaluate(noeud); //heuristic
-            return (tour ? h : -h);
+            return h;//(tour ? -h : h);
         }
         //creer les enfants
         noeud.genererEnfants();
@@ -122,7 +119,7 @@ public class JoueurArtificiel implements Joueur {
 
     private int heuristic1(Grille g) {
         Set<Ligne> lignes = new HashSet<Ligne>();
-        int joueur = getDernierJoueur(g);
+        int joueur = joueurCourant;
 
         for (int l = 0; l < g.getData().length; l++) {
             for (int c = 0; c < g.getData()[0].length; c++) {
@@ -136,7 +133,7 @@ public class JoueurArtificiel implements Joueur {
     }
     
      private int heuristic2(Grille g) {
-        int joueur = getDernierJoueur(g);
+        int joueur = joueurCourant;
         GrilleVerificateur gv = new GrilleVerificateur();
         
         if(gv.determineGagnant(g) == joueur)
