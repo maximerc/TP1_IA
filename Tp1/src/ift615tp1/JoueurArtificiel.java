@@ -49,7 +49,8 @@ public class JoueurArtificiel implements Joueur {
 
     public int evaluate(Noeud noeud) {
         int value = 0;
-        value += heuristic1(noeud.g);
+        value += heuristic1(noeud.g, joueurCourant);
+		value -= heuristic1(noeud.g, (joueurCourant==1) ? 2 : 1);
 
         return value;
     }
@@ -125,14 +126,14 @@ public class JoueurArtificiel implements Joueur {
         }
     }
 
-    private int heuristic1(Grille g) {
+    private int heuristic1(Grille g, int paramJoueur) {
 		// HashMap contenant les lignesPossibles possibles
 		// Clé: String contenant les coord des points de début et fin de la ligne 
 		//		Exemple: pour ligne({1,1},{1,5}), la clé serait 1115
         HashMap<String, Ligne> lignesPossibles = new HashMap<>();
 		HashMap<String, Ligne> lignesReels = new HashMap<>();
 		
-        int joueur = joueurCourant;
+        int joueur = paramJoueur;
 		int heuristic = 0;
 
         for (int l = 0; l < g.getData().length; l++) {
