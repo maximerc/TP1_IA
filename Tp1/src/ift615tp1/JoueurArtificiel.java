@@ -24,10 +24,10 @@ public class JoueurArtificiel implements Joueur {
 	
 	// Nb de points ajouté à l'heuristique lorsque l'algo 
 	// découvre une occucurence de plus d'une ligne possible
-	private final int[] SCORE_LIGNES_POSSIBLES = new int[]{1, 2, 4, 8, 32};
-	private final int[] SCORE_LIGNES_REELS = new int[]{1, 2, 4, 8, 32};
+	private final int[] SCORE_LIGNES_POSSIBLES = new int[]{1, 2, 4, 8, 16};
+	private final int[] SCORE_LIGNES_REELS = new int[]{1, 2, 8, 16, 10000};
 	private final int LIGNES_POSSIBLES_MULT = 1;	// On multiplie le score de cette partie d'heuristique par ce nombre
-	private final int LIGNES_REELS_MULT = 10;		// On multiplie le score de cette partie d'heuristique par ce nombre
+	private final int LIGNES_REELS_MULT = 20;		// On multiplie le score de cette partie d'heuristique par ce nombre
 
     public int getDernierJoueur(Grille g) {
             return ( g.nbLibre()%2==0 ) ? 2 : 1;
@@ -49,8 +49,14 @@ public class JoueurArtificiel implements Joueur {
 
     public int evaluate(Noeud noeud) {
         int value = 0;
-        value += heuristic1(noeud.g, joueurCourant);
-		value -= heuristic1(noeud.g, (joueurCourant==1) ? 2 : 1);
+		int h1max = heuristic1(noeud.g, joueurCourant);
+		int h1min = heuristic1(noeud.g, (joueurCourant==1) ? 2 : 1);
+        value = h1max - h1min;
+		
+		System.out.println("h1max:" + h1max);
+		System.out.println("h1min:" + h1min);
+		System.out.println("h1:" + value);
+		System.out.println("-----------");
 
         return value;
     }
@@ -76,7 +82,7 @@ public class JoueurArtificiel implements Joueur {
             System.out.println("Message "+ex.getMessage());
             // TODO : planter si l'exception n'est pas un "Timeout"
         }
-        System.out.println("Noeud max : " + this.evaluate(this.dernierNoeudMaxValide));
+        this.evaluate(this.dernierNoeudMaxValide);
         return this.dernierNoeudMaxValide;
 
     }
@@ -132,6 +138,8 @@ public class JoueurArtificiel implements Joueur {
 		//		Exemple: pour ligne({1,1},{1,5}), la clé serait 1115
         HashMap<String, Ligne> lignesPossibles = new HashMap<>();
 		HashMap<String, Ligne> lignesReels = new HashMap<>();
+		
+		System.out.println("paramJoueur:" + paramJoueur);
 		
         int joueur = paramJoueur;
 		int heuristic = 0;
