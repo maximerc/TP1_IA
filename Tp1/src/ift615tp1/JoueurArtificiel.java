@@ -1,6 +1,7 @@
 package ift615tp1;
 
 import connect5.Grille;
+import connect5.GrilleVerificateur;
 import connect5.Joueur;
 import ift615tp1.Arbre.Noeud;
 import java.util.HashSet;
@@ -43,7 +44,7 @@ public class JoueurArtificiel implements Joueur {
     public int evaluate(Noeud noeud) {
         int value = 0;
         value += heuristic1(noeud.g);
-        //value += heuristic2(g);
+        value += heuristic2(noeud.g);
         //value += heuristic3(g);
 
         return value;
@@ -66,8 +67,8 @@ public class JoueurArtificiel implements Joueur {
                 alphaBeta(arbre.racine, profondeur, a, b, true);
 
                 profondeur++;
-                //System.out.println("profondeur: " + profondeur + " - nblibre : " + g.nbLibre());
-                if (profondeur > g.nbLibre()) {
+                System.out.println("profondeur: " + profondeur + " - nblibre : " + g.nbLibre());
+                if (profondeur > 2) {//g.nbLibre()) {
                     break;
                 }
             }
@@ -96,7 +97,7 @@ public class JoueurArtificiel implements Joueur {
         if (tour == true) {
             for (Noeud enfant : noeud.enfants) {
                 int alpha = alphaBeta(enfant, profondeur - 1, a, b, !tour);
-                if (a > alpha) {
+                if (alpha > a) {
                     a = alpha;
                     this.noeudMax = enfant;
                 }
@@ -108,7 +109,7 @@ public class JoueurArtificiel implements Joueur {
         } else {  // Min
             for (Noeud enfant : noeud.enfants) {
                 int beta = alphaBeta(enfant, profondeur - 1, a, b, !tour);
-                if (b < beta) {
+                if (beta < b) {
                     b = beta;
                 }
                 if (b <= a) {
@@ -132,6 +133,16 @@ public class JoueurArtificiel implements Joueur {
         }
 
         return lignes.size();
+    }
+    
+     private int heuristic2(Grille g) {
+        int joueur = getDernierJoueur(g);
+        GrilleVerificateur gv = new GrilleVerificateur();
+        
+        if(gv.determineGagnant(g) == joueur)
+            return 1000;
+        else
+            return 0;
     }
 
     private void TesterLignesPossibles(int l, int c, Grille g, Set<Ligne> lignes, int joueur) {
