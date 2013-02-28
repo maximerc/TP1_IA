@@ -24,10 +24,7 @@ public class JoueurArtificiel implements Joueur {
 	
 	// Nb de points ajouté à l'heuristique lorsque l'algo 
 	// découvre une occucurence de plus d'une ligne possible
-	private final int[] SCORE_LIGNES_POSSIBLES = new int[]{1, 2, 4, 8, 16};
-	private final int[] SCORE_LIGNES_REELS = new int[]{1, 2, 8, 16, 10000};
-	private final int LIGNES_POSSIBLES_MULT = 1;	// On multiplie le score de cette partie d'heuristique par ce nombre
-	private final int LIGNES_REELS_MULT = 20;		// On multiplie le score de cette partie d'heuristique par ce nombre
+	private final int[] SCORE_LIGNES_POSSIBLES = new int[]{1, 4, 64, 120, 10000};
 
     public int getDernierJoueur(Grille g) {
             return ( g.nbLibre()%2==0 ) ? 2 : 1;
@@ -53,10 +50,10 @@ public class JoueurArtificiel implements Joueur {
 		int h1min = heuristic1(noeud.g, (joueurCourant==1) ? 2 : 1);
         value = h1max - h1min;
 		
-		System.out.println("h1max:" + h1max);
+		/*System.out.println("h1max:" + h1max);
 		System.out.println("h1min:" + h1min);
 		System.out.println("h1:" + value);
-		System.out.println("-----------");
+		System.out.println("-----------");*/
 
         return value;
     }
@@ -82,7 +79,7 @@ public class JoueurArtificiel implements Joueur {
             System.out.println("Message "+ex.getMessage());
             // TODO : planter si l'exception n'est pas un "Timeout"
         }
-        this.evaluate(this.dernierNoeudMaxValide);
+        System.out.println("h choisie:" + this.evaluate(this.dernierNoeudMaxValide));
         return this.dernierNoeudMaxValide;
 
     }
@@ -137,9 +134,6 @@ public class JoueurArtificiel implements Joueur {
 		// Clé: String contenant les coord des points de début et fin de la ligne 
 		//		Exemple: pour ligne({1,1},{1,5}), la clé serait 1115
         HashMap<String, Ligne> lignesPossibles = new HashMap<>();
-		HashMap<String, Ligne> lignesReels = new HashMap<>();
-		
-		System.out.println("paramJoueur:" + paramJoueur);
 		
         int joueur = paramJoueur;
 		int heuristic = 0;
@@ -147,7 +141,7 @@ public class JoueurArtificiel implements Joueur {
         for (int l = 0; l < g.getData().length; l++) {
             for (int c = 0; c < g.getData()[0].length; c++) {
                 if (g.getData()[l][c] == joueur) {
-                    heuristic += TesterLignes(l, c, g, lignesPossibles, lignesReels, joueur);
+                    heuristic += TesterLignes(l, c, g, lignesPossibles, joueur);
                 }
             }
         }
@@ -167,12 +161,9 @@ public class JoueurArtificiel implements Joueur {
     }
 	 */
 	 
-    private int TesterLignes(	int l, int c, Grille g, HashMap<String, Ligne> lignesPossibles, 
-								HashMap<String, Ligne> lignesReels, int joueur) {
+    private int TesterLignes(int l, int c, Grille g, HashMap<String, Ligne> lignesPossibles, int joueur) {
         int nbEnLignePossible = 0;
-		int nbEnLigneReel = 0;
 		int hLignePossible = 0;		// Heuristique pour les lignesPossibles possibles
-		int hLigneReel = 0;			// Heuristique pour les lignesPossibles réeles
 
         //****** HORIZONTAL *********
         for (int i = c - 4; i <= c + 4; i++) {
@@ -185,27 +176,14 @@ public class JoueurArtificiel implements Joueur {
             } else {
                 nbEnLignePossible = 0;
             }
-			
-            if (g.getData()[l][i] == joueur) {
-                nbEnLigneReel++;
-            } else {
-                nbEnLigneReel = 0;
-            }
 
             if (nbEnLignePossible >= 5) {
 				hLignePossible += ajouterLignePossible(lignesPossibles, l, i - 4, l, i);
 
                 nbEnLignePossible--;
             }
-			
-            if (nbEnLigneReel >= 2) {
-				hLigneReel += ajouterLigneReel(lignesReels, l, i - 4, l, i, nbEnLigneReel);
-
-                nbEnLigneReel--;
-            }
         }
         nbEnLignePossible = 0;
-		nbEnLigneReel = 0;
         //System.out.println("Horizontal : " + lignesPossibles.size());
 
         //****** VERTICAL *********
@@ -220,26 +198,13 @@ public class JoueurArtificiel implements Joueur {
                 nbEnLignePossible = 0;
             }
 			
-            if (g.getData()[i][c] == joueur) {
-                nbEnLigneReel++;
-            } else {
-                nbEnLigneReel = 0;
-            }
-
             if (nbEnLignePossible >= 5) {
 				hLignePossible += ajouterLignePossible(lignesPossibles, i - 4, c, i, c);
 
                 nbEnLignePossible--;
             }
-			
-            if (nbEnLigneReel >= 2) {
-				hLigneReel += ajouterLigneReel(lignesReels, i - 4, c, i, c, nbEnLigneReel);
-
-                nbEnLigneReel--;
-            }
         }
         nbEnLignePossible = 0;
-		nbEnLigneReel = 0;
         //System.out.println("Vertical : " + lignesPossibles.size());
 
         //****** DIAGONAL \ *********
@@ -255,27 +220,13 @@ public class JoueurArtificiel implements Joueur {
             } else {
                 nbEnLignePossible = 0;
             }
-			
-            if (g.getData()[l + i][c + i] == joueur) {
-                nbEnLigneReel++;
-            } else {
-                nbEnLigneReel = 0;
-            }
 
             if (nbEnLignePossible >= 5) {
 				hLignePossible += ajouterLignePossible(lignesPossibles, l + i - 4, c + i - 4, l + i, c + i);
                 nbEnLignePossible--;
             }
-			
-            if (nbEnLigneReel >= 2) {
-				hLigneReel += ajouterLigneReel(lignesReels,  l + i - 4, c + i - 4, l + i, c + i, nbEnLigneReel);
-
-                nbEnLigneReel--;
-            }
-
         }
         nbEnLignePossible = 0;
-		nbEnLigneReel = 0;
         //System.out.println("Diago \\ : " + lignesPossibles.size());
 
         //****** DIAGONAL / *********
@@ -290,26 +241,14 @@ public class JoueurArtificiel implements Joueur {
             } else {
                 nbEnLignePossible = 0;
             }
-			
-            if (g.getData()[l + i][c - i] == joueur) {
-                nbEnLigneReel++;
-            } else {
-                nbEnLigneReel = 0;
-            }
 
             if (nbEnLignePossible >= 5) {
 				hLignePossible += ajouterLignePossible(lignesPossibles, l + i, c + i, l + i + 4, c + i + 4);
                 nbEnLignePossible--;
             }
-			
-            if (nbEnLigneReel >= 2) {
-				hLigneReel += ajouterLigneReel(lignesReels, l + i, c + i, l + i + 4, c + i + 4, nbEnLigneReel);
-
-                nbEnLigneReel--;
-            }
         }
         //System.out.println("Diago / : " + lignesPossibles.size());
-		return (hLignePossible * LIGNES_POSSIBLES_MULT) + (hLigneReel * LIGNES_REELS_MULT);
+		return hLignePossible;
     }
     
     private int ajouterLignePossible(HashMap<String, Ligne> lignes, int l1, int c1, int l2, int c2) {
@@ -327,20 +266,6 @@ public class JoueurArtificiel implements Joueur {
 		} else {
 			lignes.put(""+l1+c1+l2+c2,new Ligne(l1, c1, l2, c2));
 			heuristic = SCORE_LIGNES_POSSIBLES[0];
-		}
-		
-		return heuristic;
-    }
-	
-    private int ajouterLigneReel(HashMap<String, Ligne> lignes, int l1, int c1, int l2, int c2, int nbEnLigne) {
-		
-		Ligne dansHashmap = lignes.get(""+l1+c1+l2+c2);
-		int heuristic = 0;
-        
-        // Si la ligne existe déjà dans le hashmap, on passe
-		if(dansHashmap == null) {
-			lignes.put(""+l1+c1+l2+c2,new Ligne(l1, c1, l2, c2));
-			heuristic = SCORE_LIGNES_REELS[nbEnLigne];
 		}
 		
 		return heuristic;
