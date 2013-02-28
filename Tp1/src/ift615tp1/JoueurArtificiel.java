@@ -24,7 +24,7 @@ public class JoueurArtificiel implements Joueur {
 	
 	// Nb de points ajouté à l'heuristique lorsque l'algo 
 	// découvre une occucurence de plus d'une ligne possible
-	private final int[] SCORE_LIGNES_POSSIBLES = new int[]{1, 4, 64, 120, 10000};
+	private final int[] SCORE_LIGNES_POSSIBLES = new int[]{1, 4, 64, 10000};
 
     public int getDernierJoueur(Grille g) {
             return ( g.nbLibre()%2==0 ) ? 2 : 1;
@@ -94,7 +94,14 @@ public class JoueurArtificiel implements Joueur {
         if (System.currentTimeMillis() > timeout - 100) {
             throw new Exception("Fin temps limite");
         }
-        
+		
+		GrilleVerificateur gv = new GrilleVerificateur();
+		
+		if (gv.determineGagnant(noeud.g) != 0){
+            int h = evaluate(noeud); //heuristic
+            return h;//(tour ? -h : h);
+		}
+		
         if (profondeur <= 0 || noeud.g.nbLibre() == 0) {
             int h = evaluate(noeud); //heuristic
             return h;//(tour ? -h : h);
