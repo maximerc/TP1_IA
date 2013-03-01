@@ -25,6 +25,7 @@ public class JoueurArtificiel implements Joueur {
 	// Nb de points ajouté à l'heuristique lorsque l'algo 
 	// découvre une occucurence de plus d'une ligne possible
 	private final int[] SCORE_LIGNES_POSSIBLES = new int[]{1, 4, 64, 180, 10000};
+	private final int[] SCORE_LIGNES_ADVERSAIRE = new int[]{2, 8, 180, 500, 10000};
 
     public int getDernierJoueur(Grille g) {
             return ( g.nbLibre()%2==0 ) ? 2 : 1;
@@ -175,7 +176,7 @@ public class JoueurArtificiel implements Joueur {
             }
 
             if (nbEnLignePossible >= 5) {
-				hLignePossible += ajouterLignePossible(lignesPossibles, l, i - 4, l, i);
+				hLignePossible += ajouterLignePossible(lignesPossibles, joueur, l, i - 4, l, i);
 
                 nbEnLignePossible--;
             }
@@ -196,7 +197,7 @@ public class JoueurArtificiel implements Joueur {
             }
 			
             if (nbEnLignePossible >= 5) {
-				hLignePossible += ajouterLignePossible(lignesPossibles, i - 4, c, i, c);
+				hLignePossible += ajouterLignePossible(lignesPossibles, joueur, i - 4, c, i, c);
 
                 nbEnLignePossible--;
             }
@@ -219,7 +220,7 @@ public class JoueurArtificiel implements Joueur {
             }
 
             if (nbEnLignePossible >= 5) {
-				hLignePossible += ajouterLignePossible(lignesPossibles, l + i - 4, c + i - 4, l + i, c + i);
+				hLignePossible += ajouterLignePossible(lignesPossibles, joueur, l + i - 4, c + i - 4, l + i, c + i);
                 nbEnLignePossible--;
             }
         }
@@ -240,7 +241,7 @@ public class JoueurArtificiel implements Joueur {
             }
 
             if (nbEnLignePossible >= 5) {
-				hLignePossible += ajouterLignePossible(lignesPossibles, l + i, c - i, l + i + 4, c - i + 4);
+				hLignePossible += ajouterLignePossible(lignesPossibles, joueur, l + i, c - i, l + i + 4, c - i + 4);
                 nbEnLignePossible--;
             }
         }
@@ -248,20 +249,23 @@ public class JoueurArtificiel implements Joueur {
 		return hLignePossible;
     }
     
-    private int ajouterLignePossible(HashMap<String, Ligne> lignes, int l1, int c1, int l2, int c2) {
-		
-		Ligne dansHashmap = lignes.get(""+l1+c1+l2+c2);
+    private int ajouterLignePossible(HashMap<String, Ligne> lignes, int joueur, int l1, int c1, int l2, int c2) {
+		Ligne dansHashmap = lignes.get(l1+","+c1+","+l2+","+c2);
 		int heuristic = 0;
         
         // Si la ligne existe déjà dans le hashmap, on augmente son nb d'occurence
 		if(dansHashmap != null) {
 			int nbOccurences = dansHashmap.getNbOccurences();
 			nbOccurences++;
-			heuristic = SCORE_LIGNES_POSSIBLES[nbOccurences - 1];	// - 1 car le tableau commence à 0
+			if (joueur == 1) {
+				heuristic = SCORE_LIGNES_POSSIBLES[nbOccurences - 1];
+			} else {
+				heuristic = SCORE_LIGNES_ADVERSAIRE[nbOccurences - 1];
+			}
 			dansHashmap.setNbOccurences(nbOccurences);
 		// Sinon on l'ajoute au HashMap
 		} else {
-			lignes.put(""+l1+c1+l2+c2,new Ligne(l1, c1, l2, c2));
+			lignes.put(l1+","+c1+","+l2+","+c2,new Ligne(l1, c1, l2, c2));
 			heuristic = SCORE_LIGNES_POSSIBLES[0];
 		}
 		
