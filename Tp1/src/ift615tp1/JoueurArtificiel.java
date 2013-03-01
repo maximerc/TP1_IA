@@ -24,7 +24,7 @@ public class JoueurArtificiel implements Joueur {
 	
 	// Nb de points ajouté à l'heuristique lorsque l'algo 
 	// découvre une occucurence de plus d'une ligne possible
-	private final int[] SCORE_LIGNES_POSSIBLES = new int[]{1, 4, 64, 10000};
+	private final int[] SCORE_LIGNES_POSSIBLES = new int[]{1, 4, 64, 180, 10000};
 
     public int getDernierJoueur(Grille g) {
             return ( g.nbLibre()%2==0 ) ? 2 : 1;
@@ -84,12 +84,7 @@ public class JoueurArtificiel implements Joueur {
 
     }
 
-    public int alphaBeta(Noeud noeud, int profondeur, int a, int b, boolean tour) throws Exception {
-//        if (System.currentTimeMillis() < finHorlogeDeGarde) {
-////            return this.noeudMax;
-//            throw new Exception("Timeout");
-//        }
-//        
+    public int alphaBeta(Noeud noeud, int profondeur, int a, int b, boolean tour) throws Exception {      
         
         if (System.currentTimeMillis() > timeout - 100) {
             throw new Exception("Fin temps limite");
@@ -97,14 +92,9 @@ public class JoueurArtificiel implements Joueur {
 		
 		GrilleVerificateur gv = new GrilleVerificateur();
 		
-		if (gv.determineGagnant(noeud.g) != 0){
+        if (profondeur <= 0 || noeud.g.nbLibre() == 0 || gv.determineGagnant(noeud.g) != 0) {
             int h = evaluate(noeud); //heuristic
-            return h;//(tour ? -h : h);
-		}
-		
-        if (profondeur <= 0 || noeud.g.nbLibre() == 0) {
-            int h = evaluate(noeud); //heuristic
-            return h;//(tour ? -h : h);
+            return h;
         }
         //creer les enfants
         noeud.genererEnfants();
@@ -250,7 +240,7 @@ public class JoueurArtificiel implements Joueur {
             }
 
             if (nbEnLignePossible >= 5) {
-				hLignePossible += ajouterLignePossible(lignesPossibles, l + i, c + i, l + i + 4, c + i + 4);
+				hLignePossible += ajouterLignePossible(lignesPossibles, l + i, c - i, l + i + 4, c - i + 4);
                 nbEnLignePossible--;
             }
         }
@@ -266,8 +256,8 @@ public class JoueurArtificiel implements Joueur {
         // Si la ligne existe déjà dans le hashmap, on augmente son nb d'occurence
 		if(dansHashmap != null) {
 			int nbOccurences = dansHashmap.getNbOccurences();
-			heuristic = SCORE_LIGNES_POSSIBLES[nbOccurences - 1];	// - 1 car le tableau commence à 0
 			nbOccurences++;
+			heuristic = SCORE_LIGNES_POSSIBLES[nbOccurences - 1];	// - 1 car le tableau commence à 0
 			dansHashmap.setNbOccurences(nbOccurences);
 		// Sinon on l'ajoute au HashMap
 		} else {
